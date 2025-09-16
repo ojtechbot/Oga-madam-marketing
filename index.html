@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oga Madam Flyer ROI Calculator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF7F3E;
+            --primary-light: #FFE0D0;
+            --secondary: #20c997;
+            --light: #FFF9F5;
+            --dark: #2D2D2D;
+            --success: #28a745;
+        }
+        
+        body {
+            background-color: var(--light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+        
+        /* Preloader */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .spinner {
+            width: 64px;
+            height: 64px;
+            border: 4px solid var(--primary-light);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary), #FF9F6B);
+            color: white;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100%;
+            background: white;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            padding-top: 60px;
+        }
+        
+        .sidebar.open {
+            left: 0;
+        }
+        
+        .sidebar .nav-link {
+            color: var(--dark);
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s;
+        }
+        
+        .sidebar .nav-link:hover {
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+        
+        .sidebar-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+        
+        /* Main Content */
+        .calculator-container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .calculator-container:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .btn-primary:hover {
+            background-color: #E6712E;
+            border-color: #E6712E;
+        }
+        
+        .btn-contact {
+            background-color: var(--secondary);
+            border-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-contact:hover {
+            background-color: #199d7a;
+            border-color: #199d7a;
+            color: white;
+        }
+        
+        .result-card {
+            background: linear-gradient(135deg, var(--primary), #FF9F6B);
+            color: white;
+            border-radius: 12px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .conversion-note {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-style: italic;
+        }
+        
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .benefits-section {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
+        }
+        
+        .benefit-item {
+            padding: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .benefit-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .footer {
+            background-color: var(--dark);
+            color: white;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(255, 127, 62, 0.25);
+        }
+        
+        /* Slider styling */
+        .form-range::-webkit-slider-thumb {
+            background: var(--primary);
+        }
+        
+        .form-range::-moz-range-thumb {
+            background: var(--primary);
+        }
+        
+        /* Chart container */
+        .chart-container {
+            height: 250px;
+            margin-top: 20px;
+        }
+        
+        /* Testimonials */
+        .testimonial-card {
+            border-left: 4px solid var(--primary);
+            transition: transform 0.3s;
+        }
+        
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        /* Trust badges */
+        .trust-badge {
+            height: 60px;
+            filter: grayscale(100%);
+            opacity: 0.7;
+            transition: all 0.3s;
+        }
+        
+        .trust-badge:hover {
+            filter: grayscale(0);
+            opacity: 1;
+        }
+        
+        /* Mobile optimization */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 250px;
+                left: -250px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Overlay for sidebar -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <span class="sidebar-close" id="sidebarClose"><i class="bi bi-x-lg"></i></span>
+        <div class="px-4 py-3 border-bottom">
+            <h4>Oga Madam Marketing</h4>
+        </div>
+        <ul class="nav flex-column">
+            <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-house me-2"></i>Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-calculator me-2"></i>ROI Calculator</a></li>
+            <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-info-circle me-2"></i>About Us</a></li>
+            <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-collection me-2"></i>Our Services</a></li>
+            <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-people me-2"></i>Case Studies</a></li>
+            <li class="nav-item"><a class="nav-link" href="#"><i class="bi bi-telephone me-2"></i>Contact</a></li>
+        </ul>
+        <div class="px-4 py-3 mt-auto">
+            <div class="d-grid">
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#contactModal">
+                    <i class="bi bi-envelope me-2"></i>Get in Touch
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header py-4 mb-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-6 col-md-8">
+                    <button class="btn btn-light me-3" id="sidebarToggle">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <h1 class="display-5 fw-bold d-inline-block"><i class="bi bi-megaphone me-3"></i>Oga Madam Flyer ROI Calculator</h1>
+                </div>
+                <div class="col-6 col-md-4 text-end">
+                    <button class="btn btn-light btn-lg" data-bs-toggle="modal" data-bs-target="#contactModal">
+                        <i class="bi bi-envelope me-2"></i>Contact Us
+                    </button>
+                </div>
+            </div>
+            <p class="lead mt-2">Estimate how many customers your flyer campaign can bring</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mb-5">
+        <div class="row">
+            <!-- Calculator Section -->
+            <div class="col-lg-8 mb-5">
+                <div class="calculator-container p-4 p-md-5">
+                    <h2 class="mb-4"><i class="bi bi-calculator me-2"></i>Calculate Your Flyer ROI</h2>
+                    <p class="text-muted mb-4">Enter your details below to estimate the potential return on investment for your flyer campaign</p>
+                    
+                    <form id="roiCalculator">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="flyers" class="form-label">Number of Flyers</label>
+                                <input type="number" class="form-control form-control-lg" id="flyers" placeholder="e.g., 1000" min="100" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="neighbourhood" class="form-label">Neighbourhood</label>
+                                <select class="form-select form-select-lg" id="neighbourhood" required>
+                                    <option value="" selected disabled>Select neighbourhood</option>
+                                    <option value="surulere">Surulere</option>
+                                    <option value="victoriaIsland">Victoria Island</option>
+                                    <option value="ikeja">Ikeja</option>
+                                    <option value="lekki">Lekki</option>
+                                    <option value="ajah">Ajah</option>
+                                    <option value="yaba">Yaba</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="businessType" class="form-label">Business Type</label>
+                            <select class="form-select form-select-lg" id="businessType" required>
+                                <option value="" selected disabled>Select business type</option>
+                                <option value="restaurant">Restaurant</option>
+                                <option value="clothing">Clothing Store</option>
+                                <option value="salon">Salon</option>
+                                <option value="electronics">Electronics Store</option>
+                                <option value="grocery">Grocery Store</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="avgSpend" class="form-label">Average Customer Spend (₦)</label>
+                            <input type="number" class="form-control form-control-lg" id="avgSpend" placeholder="e.g., 3000" min="500" required>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="conversionAdjust" class="form-label">Adjust Conversion Rate: <span id="conversionValue">1.5%</span></label>
+                            <input type="range" class="form-range" id="conversionAdjust" min="0.5" max="5" step="0.1" value="1.5">
+                            <div class="form-text">Drag to adjust the conversion rate based on your flyer quality and design</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="campaignCost" class="form-label">Campaign Cost (₦)</label>
+                            <input type="number" class="form-control form-control-lg" id="campaignCost" placeholder="e.g., 15000" min="0">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="referralSource" class="form-label">How did you hear about us?</label>
+                            <select class="form-select form-select-lg" id="referralSource">
+                                <option value="" selected disabled>Select source</option>
+                                <option value="search">Search Engine</option>
+                                <option value="social">Social Media</option>
+                                <option value="friend">Friend Referral</option>
+                                <option value="ad">Online Advertisement</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4 form-check">
+                            <input type="checkbox" class="form-check-input" id="saveResults">
+                            <label class="form-check-label" for="saveResults">Email me these results</label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-lg w-100 py-3" id="calculateBtn">
+                            <i class="bi bi-lightning-charge me-2"></i>Calculate ROI
+                        </button>
+                    </form>
+                    
+                    <!-- Results -->
+                    <div class="result-card p-4 mt-4" id="resultCard">
+                        <h3 class="mb-3"><i class="bi bi-graph-up me-2"></i>Estimated Results</h3>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Conversion Rate:</span>
+                            <span id="conversionRate">1.5%</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Estimated Customer Visits:</span>
+                            <span id="estimatedVisits" class="fw-bold">15</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Estimated Revenue:</span>
+                            <span id="estimatedRevenue" class="fw-bold">₦45,000</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Estimated ROI:</span>
+                            <span id="estimatedROI" class="fw-bold">200%</span>
+                        </div>
+                        
+                        <!-- Chart container -->
+                        <div class="chart-container" id="resultsChart">
+                            <canvas id="roiChart"></canvas>
+                        </div>
+                        
+                        <p class="conversion-note mb-0 mt-3" id="conversionNote">Based on average conversion rates for your business type in this neighbourhood.</p>
+                        
+                        <div class="d-flex mt-4">
+                            <button class="btn btn-light me-2" id="downloadPDF"><i class="bi bi-file-earmark-pdf me-2"></i>Download PDF</button>
+                            <button class="btn btn-light" id="shareResults"><i class="bi bi-share me-2"></i>Share Results</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Benefits Section -->
+            <div class="col-lg-4">
+                <div class="benefits-section p-4 p-md-5 h-100">
+                    <h3 class="mb-4"><i class="bi bi-star me-2"></i>Why Use Flyers?</h3>
+                    
+                    <div class="benefit-item text-center">
+                        <div class="feature-icon">
+                            <i class="bi bi-eye"></i>
+                        </div>
+                        <h4>High Visibility</h4>
+                        <p>Flyers placed in high-traffic areas can be seen by thousands of potential customers daily.</p>
+                    </div>
+                    
+                    <div class="benefit-item text-center">
+                        <div class="feature-icon">
+                            <i class="bi bi-geo-alt"></i>
+                        </div>
+                        <h4>Targeted Marketing</h4>
+                        <p>Reach customers in specific neighbourhoods where your target audience lives and works.</p>
+                    </div>
+                    
+                    <div class="benefit-item text-center">
+                        <div class="feature-icon">
+                            <i class="bi bi-cash-coin"></i>
+                        </div>
+                        <h4>Cost Effective</h4>
+                        <p>Flyer campaigns offer one of the highest returns on investment for local businesses.</p>
+                    </div>
+                    
+                    <!-- Trust Badges -->
+                    <div class="text-center mt-4">
+                        <p class="text-muted mb-2">Trusted by businesses across Nigeria</p>
+                        <div class="d-flex justify-content-around align-items-center flex-wrap">
+                            <img src="https://via.placeholder.com/80x40?text=Logo" alt="Trusted Company" class="trust-badge m-2">
+                            <img src="https://via.placeholder.com/80x40?text=Logo" alt="Trusted Company" class="trust-badge m-2">
+                            <img src="https://via.placeholder.com/80x40?text=Logo" alt="Trusted Company" class="trust-badge m-2">
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <button class="btn btn-contact btn-lg w-100" data-bs-toggle="modal" data-bs-target="#contactModal">
+                            <i class="bi bi-chat-dots me-2"></i>Get Customized Estimate
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Testimonials -->
+                <div class="calculator-container p-4 mt-4">
+                    <h4 class="mb-3"><i class="bi bi-chat-quote me-2"></i>What Our Clients Say</h4>
+                    
+                    <div class="testimonial-card p-3 mb-3 bg-light">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi bi-star-fill text-warning me-1"></i>
+                            <i class="bi bi-star-fill text-warning me-1"></i>
+                            <i class="bi bi-star-fill text-warning me-1"></i>
+                            <i class="bi bi-star-fill text-warning me-1"></i>
+                            <i class="bi bi-star-fill text-warning"></i>
+                        </div>
+                        <p class="mb-2">"The ROI calculator helped us plan our campaign perfectly. We got 25% more customers than projected!"</p>
+                        <p class="text-muted mb-0">- Chinedu O., Restaurant Owner</p>
+                    </div>
+                    
+                    <div class="testimonial-card p-3 bg-light">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi bi-star-fill text-warning me-1"></i>
+                            <i class="bi bi-star-fill text-warning me-1"></i>
+                            <i class="bi bi-star-fill text-warning me-1"></i>
+                            <i class="bi bi-star-fill text-warning me-1"></i>
+                            <i class="bi bi-star-half text-warning"></i>
+                        </div>
+                        <p class="mb-2">"Oga Madam's flyer service transformed our business. The calculator was spot on with its estimates."</p>
+                        <p class="text-muted mb-0">- Amaka T., Fashion Boutique</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FAQ Section -->
+    <section class="container mb-5">
+        <div class="calculator-container p-4 p-md-5">
+            <h2 class="text-center mb-4"><i class="bi bi-question-circle me-2"></i>Frequently Asked Questions</h2>
+            
+            <div class="accordion" id="faqAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                            How accurate is this calculator?
+                        </button>
+                    </h2>
+                    <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            This calculator provides estimates based on industry averages. For a more accurate projection tailored to your specific business, please contact us for a customized analysis.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                            What factors affect flyer conversion rates?
+                        </button>
+                    </h2>
+                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Conversion rates depend on many factors including flyer design, placement, offer attractiveness, seasonality, and your business's unique value proposition.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                            How can I improve my flyer campaign results?
+                        </button>
+                    </h2>
+                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            We recommend A/B testing different designs, offers, and placement strategies. Contact us for professional guidance on optimizing your flyer campaign for maximum ROI.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>Oga Madam Marketing</h3>
+                    <p>Helping Nigerian businesses grow through effective marketing strategies.</p>
+                    <div class="d-flex mt-3">
+                        <a href="#" class="text-white me-3"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-white me-3"><i class="bi bi-twitter"></i></a>
+                        <a href="#" class="text-white me-3"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="text-white"><i class="bi bi-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p>Contact us for custom marketing solutions</p>
+                    <p>Email: xuppronix@gmail.com</p>
+                    <p>Phone: +234 813 740 5450</p>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <p>© 2023 Oga Madam Marketing. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Contact Modal -->
+    <div class="modal fade" id="contactModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Get a Customized Estimate</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Our generic calculator provides estimates based on averages. For a accurate projection tailored to your specific business, please provide your details and we'll contact you with a customized analysis.</p>
+                    
+                    <form id="contactForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Your Name</label>
+                                <input type="text" class="form-control" id="name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="email" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="businessSize" class="form-label">Business Size</label>
+                                <select class="form-select" id="businessSize">
+                                    <option value="small">Small (1-10 employees)</option>
+                                    <option value="medium">Medium (11-50 employees)</option>
+                                    <option value="large">Large (50+ employees)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Additional Details</label>
+                            <textarea class="form-control" id="message" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="newsletter">
+                            <label class="form-check-label" for="newsletter">Subscribe to our marketing tips newsletter</label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="submitContact">Send Request</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Preloader
+            setTimeout(function() {
+                document.getElementById('preloader').style.display = 'none';
+            }, 1500);
+            
+            // Sidebar functionality
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebarClose = document.getElementById('sidebarClose');
+            const overlay = document.getElementById('overlay');
+            
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.add('open');
+                overlay.style.display = 'block';
+            });
+            
+            sidebarClose.addEventListener('click', closeSidebar);
+            overlay.addEventListener('click', closeSidebar);
+            
+            // Close sidebar when nav item is clicked
+            const navLinks = document.querySelectorAll('.sidebar .nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', closeSidebar);
+            });
+            
+            function closeSidebar() {
+                sidebar.classList.remove('open');
+                overlay.style.display = 'none';
+            }
+            
+            // Conversion rates by neighbourhood and business type (example data)
+            const conversionRates = {
+                surulere: {
+                    restaurant: 0.02, // 2% conversion
+                    clothing: 0.015,
+                    salon: 0.025,
+                    electronics: 0.01,
+                    grocery: 0.03
+                },
+                victoriaIsland: {
+                    restaurant: 0.015,
+                    clothing: 0.02,
+                    salon: 0.018,
+                    electronics: 0.012,
+                    grocery: 0.022
+                },
+                ikeja: {
+                    restaurant: 0.018,
+                    clothing: 0.016,
+                    salon: 0.022,
+                    electronics: 0.014,
+                    grocery: 0.028
+                },
+                lekki: {
+                    restaurant: 0.017,
+                    clothing: 0.019,
+                    salon: 0.02,
+                    electronics: 0.013,
+                    grocery: 0.025
+                },
+                ajah: {
+                    restaurant: 0.016,
+                    clothing: 0.014,
+                    salon: 0.019,
+                    electronics: 0.011,
+                    grocery: 0.024
+                },
+                yaba: {
+                    restaurant: 0.021,
+                    clothing: 0.017,
+                    salon: 0.023,
+                    electronics: 0.015,
+                    grocery: 0.029
+                }
+            };
+            
+            // Neighbourhood labels for display
+            const neighbourhoodLabels = {
+                surulere: "Surulere",
+                victoriaIsland: "Victoria Island",
+                ikeja: "Ikeja",
+                lekki: "Lekki",
+                ajah: "Ajah",
+                yaba: "Yaba"
+            };
+            
+            // Business type labels for display
+            const businessTypeLabels = {
+                restaurant: "Restaurant",
+                clothing: "Clothing Store",
+                salon: "Salon",
+                electronics: "Electronics Store",
+                grocery: "Grocery Store"
+            };
+            
+            const form = document.getElementById('roiCalculator');
+            const resultCard = document.getElementById('resultCard');
+            const conversionRateElement = document.getElementById('conversionRate');
+            const estimatedVisitsElement = document.getElementById('estimatedVisits');
+            const estimatedRevenueElement = document.getElementById('estimatedRevenue');
+            const estimatedROIElement = document.getElementById('estimatedROI');
+            const conversionNoteElement = document.getElementById('conversionNote');
+            const conversionAdjust = document.getElementById('conversionAdjust');
+            const conversionValue = document.getElementById('conversionValue');
+            
+            // Update conversion value display when slider changes
+            conversionAdjust.addEventListener('input', function() {
+                conversionValue.textContent = this.value + '%';
+            });
+            
+            // Chart variable
+            let roiChart = null;
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Show loading state
+                const calculateBtn = document.getElementById('calculateBtn');
+                calculateBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Calculating...';
+                calculateBtn.disabled = true;
+                
+                // Simulate calculation delay
+                setTimeout(function() {
+                    const flyers = parseInt(document.getElementById('flyers').value);
+                    const neighbourhood = document.getElementById('neighbourhood').value;
+                    const businessType = document.getElementById('businessType').value;
+                    const avgSpend = parseInt(document.getElementById('avgSpend').value);
+                    const campaignCost = parseInt(document.getElementById('campaignCost').value) || 0;
+                    const customConversionRate = parseFloat(conversionAdjust.value) / 100;
+                    
+                    // Get conversion rate based on inputs
+                    const baseConversionRate = conversionRates[neighbourhood][businessType];
+                    const conversionRate = customConversionRate || baseConversionRate;
+                    const estimatedVisits = Math.round(flyers * conversionRate);
+                    const estimatedRevenue = estimatedVisits * avgSpend;
+                    const roi = campaignCost > 0 ? ((estimatedRevenue - campaignCost) / campaignCost) * 100 : 0;
+                    
+                    // Update results
+                    conversionRateElement.textContent = (conversionRate * 100).toFixed(1) + '%';
+                    estimatedVisitsElement.textContent = estimatedVisits;
+                    estimatedRevenueElement.textContent = '₦' + estimatedRevenue.toLocaleString();
+                    estimatedROIElement.textContent = roi.toFixed(0) + '%';
+                    
+                    // Update conversion note
+                    conversionNoteElement.textContent = `Based on average conversion rates for ${businessTypeLabels[businessType]} in ${neighbourhoodLabels[neighbourhood]}.`;
+                    
+                    // Create or update chart
+                    createChart(estimatedRevenue, campaignCost, estimatedVisits);
+                    
+                    // Show result card
+                    resultCard.style.display = 'block';
+                    
+                    // Scroll to results
+                    resultCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    // Reset button state
+                    calculateBtn.innerHTML = '<i class="bi bi-lightning-charge me-2"></i>Calculate ROI';
+                    calculateBtn.disabled = false;
+                }, 1000);
+            });
+            
+            // Create chart function
+            function createChart(revenue, cost, visits) {
+                const ctx = document.getElementById('roiChart').getContext('2d');
+                
+                // Destroy previous chart if it exists
+                if (roiChart) {
+                    roiChart.destroy();
+                }
+                
+                // Create new chart
+                roiChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Revenue', 'Cost', 'Visits'],
+                        datasets: [{
+                            label: 'Campaign Performance',
+                            data: [revenue, cost, visits * 1000], // Scale visits for better visualization
+                            backgroundColor: [
+                                'rgba(255, 127, 62, 0.7)',
+                                'rgba(108, 117, 125, 0.7)',
+                                'rgba(32, 201, 151, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgb(255, 127, 62)',
+                                'rgb(108, 117, 125)',
+                                'rgb(32, 201, 151)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        if (value >= 1000) {
+                                            return '₦' + (value/1000).toFixed(0) + 'K';
+                                        }
+                                        return '₦' + value;
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            if (context.label === 'Visits') {
+                                                label += Math.round(context.parsed.y / 1000) + ' customers';
+                                            } else {
+                                                label += '₦' + context.parsed.y.toLocaleString();
+                                            }
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Download PDF button
+            document.getElementById('downloadPDF').addEventListener('click', function() {
+                alert('PDF download functionality would be implemented here. In a real application, this would generate a PDF report.');
+            });
+            
+            // Share results button
+            document.getElementById('shareResults').addEventListener('click', function() {
+                alert('Share functionality would be implemented here. In a real application, this would allow sharing via social media or email.');
+            });
+            
+            // Contact form submission
+            document.getElementById('submitContact').addEventListener('click', function() {
+                alert('Thank you for your inquiry! We will contact you shortly with a customized estimate.');
+                document.getElementById('contactModal').querySelector('.btn-close').click();
+            });
+        });
+    </script>
+</body>
+</html>
